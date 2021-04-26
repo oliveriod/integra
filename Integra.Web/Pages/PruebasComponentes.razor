@@ -1,0 +1,18 @@
+@page "/pruebascomponentes"
+
+
+<h3>Prueba búsqueda con componentes razor</h3>
+
+
+<div>
+	<MiRazorCliente @bind-Value="EsperoTenerElCliente"/>
+</div>
+
+@if (EsperoTenerElCliente != null)
+{
+	<p>Ha seleccionado: @EsperoTenerElCliente.ClienteId @EsperoTenerElCliente.NombreCompleto</p>}
+
+
+
+
+@code{ private ClienteDto EsperoTenerElCliente { get; set; } }

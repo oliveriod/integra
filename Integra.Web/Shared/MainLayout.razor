@@ -1,0 +1,43 @@
+@inherits LayoutComponentBase
+
+
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
+@inject Microsoft.AspNetCore.Components.NavigationManager UriHelper
+@using Blazored.Toast.Configuration
+
+<BlazoredToasts Position="ToastPosition.BottomRight"
+				Timeout="5"
+				IconType="IconType.Material"
+				ErrorIcon="error_outline"
+				InfoIcon="school"
+				SuccessIcon="done_outline"
+				WarningIcon="warning"
+				ShowProgressBar="@true" />
+
+
+<div class="page">
+
+	<div class="sidebar">
+		<NavMenu />
+	</div>
+
+	<div class="main">
+		<div class="top-row px-4">
+			<a href="https://docs.microsoft.com/en-us/aspnet/" target="_blank" class="ml-md-auto">About</a>
+		</div>
+
+		<div class="content px-4">
+			@Body
+		</div>
+	</div>
+
+
+
+
+	<footer class="footer">
+			<div class="container text-center">
+				<span class="text-muted">&copy; Inventario de Oliverio 2021</span>
+			</div>
+		</footer>
+</div>
+

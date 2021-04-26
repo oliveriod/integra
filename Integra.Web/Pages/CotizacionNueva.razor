@@ -1,0 +1,62 @@
+@inherits CotizaciónNuevaBase
+@page "/cotizacion/nueva"
+
+<h3>Prueba de cotizacións con API</h3>
+
+
+
+
+<div class="col-md-12">
+	<EditForm Model="@LaCotización" OnValidSubmit="@ModificarEnLaBaseDeDatos">
+		<FluentValidator TValidator="CotizaciónDtoValidador" />
+
+		<div class="form-row">
+			<div class="form-group col-md-8">
+
+				<BlazoredTypeahead SearchMethod="GetLosClientesLocal"
+								   @bind-Value="ElCliente"
+								   ShowDropDownOnFocus="true"
+								   placeholder="Buscar por nombre...">
+					<SelectedTemplate Context="unCliente">
+						@unCliente.NombreCompleto
+					</SelectedTemplate>
+					<ResultTemplate Context="unCliente">
+						@unCliente.ClienteId - @unCliente.NombreCompleto
+					</ResultTemplate>
+				</BlazoredTypeahead>
+				<ValidationMessage For="@(() => LaCotización.ClienteNombreCompleto)" />
+			</div>
+		</div>
+
+		<div class="form-row">
+			<div class="form-group col-md-4">
+				<label for="FechaCotización" class="control-label">Fecha</label>
+				<InputDate id="FechaCotización" class="form-control" placeholder="FechaCotización" @bind-Value="LaCotización.FechaCotización">
+				</InputDate>
+				<ValidationMessage For="@(() => LaCotización.FechaCotización)" />
+			</div>
+			<div class="form-group col-md-4">
+				<label for="ProyectoNombre" class="control-label">Proyecto</label>
+				<InputText id="ProyectoNombre" class="form-control" placeholder="SegundoApellido" @bind-Value="LaCotización.ProyectoNombre">
+				</InputText>
+				<ValidationMessage For="@(() => LaCotización.ProyectoNombre)" />
+			</div>
+			<div class="form-group col-md-4">
+				<label for="VendedorNombreCompleto" class="control-label">Vendedor</label>
+				<InputText id="VendedorNombreCompleto" class="form-control" placeholder="VendedorNombreCompleto" @bind-Value="LaCotización.VendedorNombreCompleto" />
+				<ValidationMessage For="@(() => LaCotización.VendedorNombreCompleto)" />
+			</div>
+		</div>
+
+
+		<hr />
+		<div class="form-group">
+			<button type="submit" class="btn btn-success">Save</button>
+			<button class="btn btn-primary" @onclick="CerrarFormaModal">Cancel</button>
+		</div>
+	</EditForm>
+</div>
+
+
+
+

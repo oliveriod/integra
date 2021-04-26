@@ -1,0 +1,185 @@
+@inherits CotizaciónBase
+@page "/cotizacion"
+
+<h3>Prueba de cotizacións con API</h3>
+
+<div class="row mb-3">
+	<div class="col-md-7">
+		@if (IsLoggedOn())
+		{
+			<BSButton Class="btn btn-primary" @onclick="Adicionar">Nueva Cotización</BSButton>
+		}
+	</div>
+	<div class="input-group col-md-5 text-md-right">
+		<input name="SearchInput" type="text" class="form-control" placeholder="Cotización Nombre" @bind="this.SearchTerm" @onkeyup="BuscarCajaDeBúsquedaKeyPress" />
+
+		<div class="input-group-btn">
+			<button name="SearchButton" class="btn btn-default" @onclick="BuscarClick">
+				<i class="oi oi-magnifying-glass" title="search" aria-hidden="true"></i>
+			</button>
+		</div>
+
+		<div class="input-group-btn">
+			<button name="SearchClear" class="btn btn-default" @onclick="BuscarCajaDeBúsquedaLimpiar">
+				<i class="oi oi-x" title="clear" aria-hidden="true"></i>
+			</button>
+		</div>
+	</div>
+</div>
+
+
+@if (LasCotizaciones == null)
+{
+	<p><em>Loading...</em></p>
+}
+else
+{
+	<BSTable IsResponsive="true" class='table'>
+		<thead class="thead-light">
+			<tr>
+				<th># Cotización</th>
+				<th>Fecha</th>
+				<th>Cliente</th>
+				<th>Proyecto</th>
+				<th>Vendedor</th>
+				<th>Acción</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var cotización in LasCotizaciones.LosRegistros)
+			{
+			<tr>
+				<td>@cotización.CotizaciónId</td>
+				<td>@cotización.FechaCotización</td>
+				<td>@cotización.ClienteNombreCompleto</td>
+				<td>@cotización.ProyectoNombre</td>
+				<td>@cotización.VendedorNombreCompleto</td>
+				<td>
+					<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-eye text-primary" @onclick="@(async () => await Ver(cotización.CotizaciónId))"></BSButton>
+					@if (IsLoggedOn())
+					{
+						<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-pencil text-warning" @onclick="@(async () => await Actualizar(cotización.CotizaciónId))"></BSButton>
+						<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-trash text-danger" @onclick="@(async () => await Eliminar(cotización.CotizaciónId))"></BSButton>
+					}
+				</td>
+			</tr>
+			}
+		</tbody>
+	</BSTable>
+
+	<MiPaginador Result=@LasCotizaciones PageChanged="MiPaginadorPageChanged" />
+
+
+
+	<div>
+		<BSModal @bind-IsOpen="@EsAdicionar" Size="Size.Large" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+			<BSModalHeader @onclick="CerrarFormaModal">@ModalTitle</BSModalHeader>
+			<BSModalBody>
+
+				<div class="col-md-12">
+					<EditForm Model="@LaCotización" OnValidSubmit="@ModificarEnLaBaseDeDatos">
+						<FluentValidator TValidator="CotizaciónDtoValidador" />
+
+						<div class="form-row">
+							<div class="form-group col-md-8">
+								<label for="ClienteNombreCompleto" class="control-label">ClienteNombreCompleto</label>
+								<InputText id="ClienteNombreCompleto" class="form-control" placeholder="ClienteNombreCompleto" @bind-Value="LaCotización.ClienteNombreCompleto" />
+								<ValidationMessage For="@(() => LaCotización.ClienteNombreCompleto)" />
+							</div>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group col-md-4">
+								<label for="FechaCotización" class="control-label">Fecha</label>
+								<InputDate id="FechaCotización" class="form-control" placeholder="FechaCotización" @bind-Value="LaCotización.FechaCotización">
+								</InputDate>
+								<ValidationMessage For="@(() => LaCotización.FechaCotización)" />
+							</div>
+							<div class="form-group col-md-4">
+								<label for="ProyectoNombre" class="control-label">Proyecto</label>
+								<InputText id="ProyectoNombre" class="form-control" placeholder="SegundoApellido" @bind-Value="LaCotización.ProyectoNombre">
+								</InputText>
+								<ValidationMessage For="@(() => LaCotización.ProyectoNombre)" />
+							</div>
+							<div class="form-group col-md-4">
+								<label for="VendedorNombreCompleto" class="control-label">Vendedor</label>
+								<InputText id="VendedorNombreCompleto" class="form-control" placeholder="VendedorNombreCompleto" @bind-Value="LaCotización.VendedorNombreCompleto" />
+								<ValidationMessage For="@(() => LaCotización.VendedorNombreCompleto)" />
+							</div>
+						</div>
+
+
+						<hr />
+						<div class="form-group">
+							<button type="submit" class="btn btn-success">Save</button>
+							<button class="btn btn-primary" @onclick="CerrarFormaModal">Cancel</button>
+						</div>
+					</EditForm>
+				</div>
+
+			</BSModalBody>
+		</BSModal>
+	</div>
+
+
+	<div>
+		<BSModal @bind-IsOpen="EsVer" Size="Size.Large" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+			<BSModalHeader @onclick="CerrarFormaModal">@ModalTitle</BSModalHeader>
+			<BSModalBody>
+
+				<h1>Soy Vista</h1>
+
+				<div class="col-md-12">
+					@if (EsEliminar)
+					{
+						<BSAlert Color="Color.Danger">Please review carefully before deleting.</BSAlert>
+					}
+					<hr />
+					<h5>Demographic Data</h5>
+					<hr />
+
+					<br />
+					<BSTable IsResponsive="true" class="table">
+						<tr>
+							<td>Artículo Id</td>
+							<td>@LaCotización.CotizaciónId</td>
+						</tr>
+						<tr>
+							<td>Cliente</td>
+							<td>@LaCotización.ClienteNombreCompleto</td>
+						</tr>
+						<tr>
+							<td>Fecha</td>
+							<td>@LaCotización.FechaCotización</td>
+						</tr>
+						<tr>
+							<td>Proyecto</td>
+							<td>@LaCotización.ProyectoNombre</td>
+						</tr>
+						<tr>
+							<td>Vendedor</td>
+							<td>@LaCotización.VendedorNombreCompleto</td>
+						</tr>
+					</BSTable>
+
+					<hr />
+
+					<div class="form-group">
+						@if (EsEliminar)
+						{
+							<button type="button" class="btn btn-danger" @onclick="(async () => await Eliminar(LaCotización.CotizaciónId))">Eliminar</button>
+							<button class="btn btn-primary" @onclick="CerrarFormaModal">Cancel</button>
+						}
+						@if (!EsEliminar)
+						{
+							<button class="btn btn-primary" @onclick="CerrarFormaModal">Back</button>
+						}
+					</div>
+				</div>
+
+			</BSModalBody>
+		</BSModal>
+	</div>
+
+
+}

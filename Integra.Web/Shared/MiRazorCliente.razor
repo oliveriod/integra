@@ -1,0 +1,48 @@
+<div>
+	<BlazoredTypeahead SearchMethod="GetLosClientesLocal"
+					   TValue="ClienteDto"
+					   TItem="ClienteDto"
+					   Value="ElCliente"
+					   ValueChanged="@( (ClienteDto s) => SelectedClienteChanged(s) )"
+					   ValueExpression="@( () => ElCliente )"
+					   placeholder="Buscar por nombre...">
+		<SelectedTemplate Context="unCliente">
+			@unCliente.NombreCompleto
+		</SelectedTemplate>
+		<ResultTemplate Context="unCliente">
+			@unCliente.NombreCompleto
+		</ResultTemplate>
+	</BlazoredTypeahead>
+
+	@if (ElCliente != null)
+	{
+		<p>Ha seleccionado: @ElCliente.ClienteId @ElCliente.NombreCompleto</p>}
+</div>
+
+@code {
+	[Inject]
+	public IClienteDataService ClienteDataService { get; set; }
+
+	public ClienteDto ElCliente;
+	private List<ClienteDto> LosClientes = new List<ClienteDto>();
+
+	private async Task<IEnumerable<ClienteDto>> GetLosClientesLocal(string searchText)
+	{
+		if (string.IsNullOrEmpty(searchText))
+		{
+			IEnumerable<ClienteDto> vacio = new List<ClienteDto>();
+			return vacio;
+		}
+		return (await ClienteDataService.TraerAyuda(searchText));
+	}
+
+	/// <summary>
+	/// Este es el método de la magia.
+	/// Originalmente era async Task porque tenía un await.
+	/// </summary>
+	/// <param name="result"></param>
+	private void SelectedClienteChanged(ClienteDto result)
+	{
+		ElCliente = result;
+	}
+}

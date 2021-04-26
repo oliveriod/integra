@@ -1,0 +1,208 @@
+@inherits ClienteBase
+@page "/cliente"
+
+
+
+<h3>Prueba de clientes con API</h3>
+
+<div class="row mb-3">
+	<div class="col-md-7">
+		@if (IsLoggedOn())
+		{
+		<BSButton Class="btn btn-primary" @onclick="AdicionarPersona">Nuevo Cliente Persona</BSButton>
+
+		<BSButton Class="btn btn-primary" @onclick="AdicionarEmpresa">Nuevo Cliente Empresa</BSButton>
+		}
+	</div>
+	<div class="input-group col-md-5 text-md-right">
+		<input name="SearchInput" type="text" class="form-control" placeholder="Cliente Nombre" @bind="this.SearchTerm" @onkeyup="BuscarCajaDeBúsquedaKeyPress" />
+
+		<div class="input-group-btn">
+			<button name="SearchButton" class="btn btn-default" @onclick="BuscarClick">
+				<i class="oi oi-magnifying-glass" title="search" aria-hidden="true"></i>
+			</button>
+		</div>
+
+		<div class="input-group-btn">
+			<button name="SearchClear" class="btn btn-default" @onclick="this.BuscarCajaDeBúsquedaLimpiar">
+				<i class="oi oi-x" title="clear" aria-hidden="true"></i>
+			</button>
+		</div>
+	</div>
+</div>
+
+
+@if (LosClientes == null)
+{
+<p><em>Loading...</em></p> }
+			else
+			{
+<BSTable IsResponsive="true" class='table'>
+	<thead class="thead-light">
+		<tr>
+			<th>Id</th>
+			<th>Nombre</th>
+			<th>email</th>
+			<th>Acción</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var cliente in LosClientes.LosRegistros)
+		{
+<tr>
+	<td>@cliente.ClienteId</td>
+	<td>@cliente.NombreCompleto</td>
+	<td>@cliente.Email</td>
+	<td>
+		<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-eye text-primary" @onclick="@(async () => await Ver(cliente.ClienteId))"></BSButton>
+		@if (IsLoggedOn())
+		{
+<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-pencil text-warning" @onclick="@(async () => await Actualizar(cliente.ClienteId))"></BSButton>
+							<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-trash text-danger" @onclick="@(async () => await Eliminar(cliente.ClienteId))"></BSButton>}
+	</td>
+</tr>}
+	</tbody>
+</BSTable>
+
+<MiPaginador Result=@LosClientes PageChanged="MiPaginadorPageChanged" />
+
+
+<div>
+	<BSModal @bind-IsOpen="@EsAdicionar" Size="Size.Large" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+		<BSModalHeader @onclick="CerrarFormaModal">@ModalTitle</BSModalHeader>
+		<BSModalBody>
+			<div class="col-md-12">
+				<EditForm Model="@ElCliente" OnValidSubmit="@ModificarEnLaBaseDeDatos">
+					<div class="form-row">
+						<div class="form-group col-md-8">
+
+						</div>
+					</div>
+
+					<div class="form-row">
+						<div class="form-group col-md-8">
+							<label for="Nombre" class="control-label">Nombre</label>
+							<InputText id="Nombre" class="form-control" placeholder="Nombre" @bind-Value="ElCliente.Nombre" />
+							<ValidationMessage For="@(() => ElCliente.Nombre)" />
+						</div>
+					</div>
+
+					@if (ElTipoEnteId == null)
+					{
+					<p><em>Esperando...</em></p>
+					}
+					@*Apellidos*@
+					else
+					{
+						@if (ElTipoEnteId == TipoEnteEnum.Persona)
+						{
+						<div class="form-row">
+							<div class="form-group col-md-4">
+								<label for="PrimerApellido" class="control-label">Primer Apellido</label>
+								<InputText id="PrimerApellido" class="form-control" placeholder="PrimerApellido" @bind-Value="ElCliente.PrimerApellido">
+								</InputText>
+								<ValidationMessage For="@(() => ElCliente.PrimerApellido)" />
+							</div>
+							<div class="form-group col-md-4">
+								<label for="SegundoApellido" class="control-label">Segundo Apellido</label>
+								<InputText id="SegundoApellido" class="form-control" placeholder="SegundoApellido" @bind-Value="ElCliente.SegundoApellido">
+								</InputText>
+								<ValidationMessage For="@(() => ElCliente.SegundoApellido)" />
+							</div>
+						</div>
+						}
+					}
+
+					<div class="form-row">
+						<div class="form-group col-md-4">
+							<label for="Identificación" class="control-label">Identificación</label>
+							<InputText id="Identificación" class="form-control" placeholder="Identificación" @bind-Value="ElCliente.Identificación" />
+							<ValidationMessage For="@(() => ElCliente.Identificación)" />
+						</div>
+						<div class="form-group col-md-4">
+							<label for="Identificación" class="control-label">Teléfono</label>
+							<InputText id="Identificación" class="form-control" placeholder="Identificación" @bind-Value="ElCliente.Teléfono" />
+							<ValidationMessage For="@(() => ElCliente.Teléfono)" />
+						</div>
+					</div>
+
+					<div class="form-row">
+						<div class="form-group col-md-8">
+							<label for="Email" class="control-label">Email</label>
+							<InputText id="Email" class="form-control" @bind-Value="ElCliente.Email">
+							</InputText>
+							<ValidationMessage For="@(() => ElCliente.Email)" />
+						</div>
+					</div>
+
+					<hr />
+
+					<div class="form-group">
+						<button type="submit" class="btn btn-success">Save</button>
+						<button class="btn btn-primary" @onclick="CerrarFormaModal">Cancel</button>
+					</div>
+
+
+
+				</EditForm>
+			</div>
+		</BSModalBody>
+	</BSModal>
+</div>
+
+
+	<div>
+		<BSModal @bind-IsOpen="EsVer" Size="Size.Large" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+			<BSModalHeader @onclick="CerrarFormaModal">@ModalTitle</BSModalHeader>
+			<BSModalBody>
+
+				<h1>Soy Vista</h1>
+
+				<div class="col-md-12">
+					@if (EsEliminar)
+					{
+<BSAlert Color="Color.Danger">Please review carefully before deleting.</BSAlert>}
+					<hr />
+					<h5>Demographic Data</h5>
+					<hr />
+
+					<br />
+					<BSTable IsResponsive="true" class="table">
+						<tr>
+							<td>Artículo Id</td>
+							<td>@ElCliente.ClienteId</td>
+						</tr>
+						<tr>
+							<td>Nombre</td>
+							<td>@ElCliente.Nombre</td>
+						</tr>
+						<tr>
+							<td>PrimerApellido</td>
+							<td>@ElCliente.PrimerApellido</td>
+						</tr>
+						<tr>
+							<td>SegundoApellido</td>
+							<td>@ElCliente.SegundoApellido</td>
+						</tr>
+						<tr>
+							<td>Email</td>
+							<td>@ElCliente.Email</td>
+						</tr>
+					</BSTable>
+
+					<hr />
+
+					<div class="form-group">
+						@if (EsEliminar)
+						{
+<button type="button" class="btn btn-danger" @onclick="(async () => await Eliminar(ElCliente.ClienteId))">Eliminar</button>
+											<button class="btn btn-primary" @onclick="CerrarFormaModal">Cancel</button>}
+						@if (!EsEliminar)
+						{
+<button class="btn btn-primary" @onclick="CerrarFormaModal">Back</button>}
+					</div>
+				</div>
+
+			</BSModalBody>
+		</BSModal>
+	</div>}

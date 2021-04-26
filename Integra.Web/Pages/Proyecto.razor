@@ -1,0 +1,187 @@
+@inherits ProyectoBase
+@page "/proyecto"
+
+
+
+<h3>Prueba de proyectos con API</h3>
+
+<div class="row mb-3">
+	<div class="col-md-7">
+		@if (IsLoggedOn())
+		{
+			<BSButton Class="btn btn-primary" @onclick="Adicionar">Nuevo Proyecto</BSButton>
+		}
+	</div>
+	<div class="input-group col-md-5 text-md-right">
+		<input name="SearchInput" type="text" class="form-control" placeholder="Proyecto Nombre" @bind="this.SearchTerm" @onkeyup="BuscarCajaDeBúsquedaKeyPress" />
+
+		<div class="input-group-btn">
+			<button name="SearchButton" class="btn btn-default" @onclick="BuscarClick">
+				<i class="oi oi-magnifying-glass" title="search" aria-hidden="true"></i>
+			</button>
+		</div>
+
+		<div class="input-group-btn">
+			<button name="SearchClear" class="btn btn-default" @onclick="BuscarCajaDeBúsquedaLimpiar">
+				<i class="oi oi-x" title="clear" aria-hidden="true"></i>
+			</button>
+		</div>
+	</div>
+</div>
+
+
+@if (LosProyectos == null)
+{
+	<p><em>Cargando...</em></p>
+}
+else
+{
+	<BSTable IsResponsive="true" class='table'>
+		<thead class="thead-light">
+			<tr>
+				<th>Código</th>
+				<th>Nombre</th>
+				<th>Cliente</th>
+				<th>Acción</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var proyecto in LosProyectos.LosRegistros)
+			{
+			<tr>
+				<td>@proyecto.Código</td>
+				<td>@proyecto.Nombre</td>
+				<td>@proyecto.Cliente.NombreCompleto</td>
+				<td>
+					<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-eye text-primary" @onclick="@(async () => await Ver(proyecto.ProyectoId))"></BSButton>
+					@if (IsLoggedOn())
+					{
+						<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-pencil text-warning" @onclick="@(async () => await Actualizar(proyecto.ProyectoId))"></BSButton>
+						<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-trash text-danger" @onclick="@(async () => await Eliminar(proyecto.ProyectoId))"></BSButton>
+					}
+				</td>
+			</tr>
+			}
+		</tbody>
+	</BSTable>
+
+	<MiPaginador Result=@LosProyectos PageChanged="MiPaginadorPageChanged" />
+
+
+
+	<div>
+		<BSModal @bind-IsOpen="@EsAdicionar" Size="Size.Large" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+			<BSModalHeader @onclick="CerrarFormaModal">@ModalTitle</BSModalHeader>
+			<BSModalBody>
+
+				<div class="col-md-12">
+					<EditForm Model="@ElProyecto" OnValidSubmit="@ModificarEnLaBaseDeDatos">
+						<FluentValidator TValidator="ProyectoDtoValidador" />
+
+						<div class="form-row">
+							<div class="form-group col-md-8">
+								<label for="Nombre" class="control-label">Nombre</label>
+								<InputText id="Nombre" class="form-control" placeholder="Nombre" @bind-Value="ElProyecto.Nombre" />
+								<ValidationMessage For="@(() => ElProyecto.Nombre)" />
+							</div>
+							<div class="form-group col-md-4">
+								<label for="Código" class="control-label">Código</label>
+								<InputText id="Código" class="form-control" placeholder="Código" @bind-Value="ElProyecto.Código" />
+								<ValidationMessage For="@(() => ElProyecto.Código)" />
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group col-md-12">
+								<BlazoredTypeahead SearchMethod="GetLosClientesLocal"
+												   @bind-Value="ElCliente"
+												   @onchange="HaCambiadoElCliente"
+												   placeholder="Buscar por nombre...">
+									<SelectedTemplate Context="unCliente">
+										@unCliente.NombreCompleto
+									</SelectedTemplate>
+									<ResultTemplate Context="unCliente">
+										@unCliente.ClienteId - @unCliente.NombreCompleto
+									</ResultTemplate>
+								</BlazoredTypeahead>
+								<ValidationMessage For="@(() => ElProyecto.ClienteId)" />
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group col-md-12">
+								<label for="Descripción" class="control-label">Descripción</label>
+								<InputText id="Descripción" class="form-control" placeholder="Descripción" @bind-Value="ElProyecto.Descripción">
+								</InputText>
+							</div>
+						</div>
+
+
+						<hr />
+						<div class="form-group">
+							<button type="submit" class="btn btn-success">Save</button>
+							<button class="btn btn-primary" @onclick="CerrarFormaModal">Cancel</button>
+						</div>
+					</EditForm>
+				</div>
+
+			</BSModalBody>
+		</BSModal>
+	</div>
+
+
+	<div>
+		<BSModal @bind-IsOpen="EsVer" Size="Size.Large" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+			<BSModalHeader @onclick="CerrarFormaModal">@ModalTitle</BSModalHeader>
+			<BSModalBody>
+
+				<h1>Soy Vista</h1>
+
+				<div class="col-md-12">
+					@if (EsEliminar)
+					{
+						<BSAlert Color="Color.Danger">Por favor revise antes de eliminar este registro.</BSAlert>
+					}
+					<hr />
+					<h5>Demographic Data</h5>
+					<hr />
+
+					<br />
+					<BSTable IsResponsive="true" class="table">
+						<tr>
+							<td>Artículo Id</td>
+							<td>@ElProyecto.ProyectoId</td>
+						</tr>
+						<tr>
+							<td>Código</td>
+							<td>@ElProyecto.Código</td>
+						</tr>
+						<tr>
+							<td>Nombre</td>
+							<td>@ElProyecto.Nombre</td>
+						</tr>
+						<tr>
+							<td>SegundoApellido</td>
+							<td>@ElProyecto.Descripción</td>
+						</tr>
+					</BSTable>
+
+					<hr />
+
+					<div class="form-group">
+						@if (EsEliminar)
+						{
+							<button type="button" class="btn btn-danger" @onclick="(async () => await Eliminar(ElProyecto.ProyectoId))">Eliminar</button>
+							<button class="btn btn-primary" @onclick="CerrarFormaModal">Cancel</button>
+						}
+						@if (!EsEliminar)
+						{
+							<button class="btn btn-primary" @onclick="CerrarFormaModal">Back</button>
+						}
+					</div>
+				</div>
+
+			</BSModalBody>
+		</BSModal>
+	</div>
+
+
+}

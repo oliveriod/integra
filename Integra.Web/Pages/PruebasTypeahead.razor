@@ -1,0 +1,50 @@
+@inherits PruebasTypeaheadBase
+
+@page "/pruebasTA"
+
+
+<hr />
+
+<h1>Blazored Typeahead - Standalone</h1>
+
+
+<BlazoredTypeahead SearchMethod="GetLosArtículosLocal"
+				   @bind-Value="ElArtículo"
+				   ShowDropDownOnFocus="true"
+				   placeholder="Buscar por nombre...">
+	<SelectedTemplate Context="unArtículo">
+		@unArtículo.Nombre
+	</SelectedTemplate>
+	<ResultTemplate Context="unArtículo">
+		@unArtículo.Código - @unArtículo.Nombre
+		<br />
+		Precio: @unArtículo.Precio.ToString("C")
+	</ResultTemplate>
+</BlazoredTypeahead>
+
+<hr />
+
+<BlazoredTypeahead SearchMethod="GetLosClientesLocal"
+				   @bind-Value="ElCliente"
+				   ShowDropDownOnFocus="true"
+				   placeholder="Buscar por nombre...">
+	<SelectedTemplate Context="unCliente">
+		@unCliente.NombreCompleto
+	</SelectedTemplate>
+	<ResultTemplate Context="unCliente">
+		@unCliente.ClienteId - @unCliente.NombreCompleto
+	</ResultTemplate>
+</BlazoredTypeahead>
+
+
+@if (ElArtículo != null)
+{
+	<p>Selected: @ElArtículo.Código @ElArtículo.Nombre</p>}
+
+@if (ElCliente != null)
+{
+	<p>Selected: @ElCliente.ClienteId @ElCliente.NombreCompleto</p>}
+
+
+
+

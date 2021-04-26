@@ -1,0 +1,48 @@
+﻿@inherits PruebasBase
+@page "/pruebas"
+
+
+<h3>Prueba búsqueda de artículos</h3>
+
+
+
+<div class="row mb-3">
+	<div class="input-group col-md-5 text-md-right">
+		@*<input name="BusquedaDinamica" type="text" class="form-control" placeholder="Artículo Nombre" bind-value:event="oninput" @bind-value="SearchTerm" />*@
+		<input name="BusquedaDinamica" type="text" class="form-control" placeholder="Artículo Nombre" @onkeyup="BuscarCajaDeBúsquedaKeyPress" @bind="SearchTerm" />
+
+	</div>
+</div>
+
+@if (LosArtículosFiltrados == null)
+{
+	<p><em>Loading...</em></p>
+}
+else
+{
+	<BSTable IsResponsive="true" class='table'>
+		<thead class="thead-light">
+			<tr>
+				<th>Código</th>
+				<th>Nombre</th>
+				<th>Descripción</th>
+				<th>Precio</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var artículo in LosArtículosFiltrados.LosRegistros)
+			{
+				<tr>
+					<td>@artículo.Código</td>
+					<td>@artículo.Nombre</td>
+					<td>@artículo.Descripción</td>
+					<td>@artículo.Precio</td>
+				</tr>
+			}
+		</tbody>
+	</BSTable>
+
+
+}
+
+

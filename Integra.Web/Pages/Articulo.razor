@@ -1,0 +1,221 @@
+@inherits ArticuloBase
+@page "/articulo"
+
+
+
+<h3>Prueba de artículos con API</h3>
+
+<div class="row mb-3">
+	<div class="col-md-7">
+		@if (IsLoggedOn())
+		{
+			<BSButton Class="btn btn-primary" @onclick="Adicionar">Nuevo artículo</BSButton>
+		}
+	</div>
+	<div class="input-group col-md-5 text-md-right">
+		<input name="ArtículoSearchInput" type="text" class="form-control" placeholder="Artículo Nombre" @bind="this.SearchTerm" @onkeyup="BuscarCajaDeBúsquedaKeyPress" />
+
+		<div class="input-group-btn">
+			<button name="ArtículoSearchButton" class="btn btn-default" @onclick="BuscarClick">
+				<i class="oi oi-magnifying-glass" title="search" aria-hidden="true"></i>
+			</button>
+		</div>
+
+		<div class="input-group-btn">
+			<button name="ArtículoSearchClear" class="btn btn-default" @onclick="BuscarCajaDeBúsquedaLimpiar">
+				<i class="oi oi-x" title="clear" aria-hidden="true"></i>
+			</button>
+		</div>
+	</div>
+</div>
+
+
+@if (LosArtículos == null)
+{
+	<p><em>Loading...</em></p>
+}
+else
+{
+	<BSTable IsResponsive="true" class='table'>
+		<thead class="thead-light">
+			<tr>
+				<th>Tipo</th>
+				<th>SubTipo</th>
+				<th>Código</th>
+				<th>Nombre</th>
+				<th>Descripción</th>
+				<th class="monto">Precio</th>
+				<th>F.Creación</th>
+				<th>F.Modific.</th>
+				<th>Acción</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var artículo in LosArtículos.LosRegistros)
+			{
+				<tr>
+					<td>@artículo.ArtículoSubTipo.ArtículoTipo.Código</td>
+					<td>@artículo.ArtículoSubTipo.Código</td>
+					<td>@artículo.Código</td>
+					<td>@artículo.Nombre</td>
+					<td>@artículo.Descripción</td>
+					<td class="monto">@artículo.Precio.ToString("C")</td>
+					<td>@artículo.FechaDeCreación</td>
+					<td>@artículo.FechaDeModificación</td>
+					<td>
+						<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-eye text-primary" @onclick="@(async () => await Ver(artículo.ArtículoId))"></BSButton>
+						@if (IsLoggedOn())
+						{
+							<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-pencil text-warning" @onclick="@(async () => await Actualizar(artículo.ArtículoId))"></BSButton>
+							<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class="oi oi-trash text-danger" @onclick="@(async () => await Eliminar(artículo.ArtículoId))"></BSButton>
+						}
+					</td>
+				</tr>
+			}
+		</tbody>
+	</BSTable>
+	<MiPaginador Result=@LosArtículos PageChanged="MiPaginadorPageChanged" />
+
+
+
+
+	<div>
+		<BSModal @bind-IsOpen="@EsAdicionar" Size="Size.Large" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+			<BSModalHeader @onclick="CerrarFormaModal">@ModalTitle</BSModalHeader>
+			<BSModalBody>
+
+				<div class="col-md-12">
+					<EditForm Model="@ElArtículo" OnValidSubmit="@ModificarEnLaBaseDeDatos">
+						<FluentValidator TValidator="ArtículoDtoValidador" />
+
+						@*Nombre*@
+						<div class="form-row">
+							<div class="form-group col-md-8">
+								<label for="Nombre" class="control-label">Nombre</label>
+								<InputText id="Nombre" class="form-control" placeholder="Nombre" @bind-Value="ElArtículo.Nombre" />
+								<ValidationMessage For="@(() => ElArtículo.Nombre)" />
+							</div>
+						</div>
+
+						@*Tipo y sub tipo de artículo*@
+						<div class="form-row">
+							<div class="form-group col-md-8">
+								<label for="TipoArtículo" class="control-label">Tipo Artículo</label>
+
+								<select value=@ActualArtículoTipoId class="form-control" @onchange="ArtículoTipoClicked">
+									<option value="">-- Seleccione el tipo de artículo --</option>
+									@foreach (var artículoTipo in LosArtículoTipos)
+									{
+					<option value="@artículoTipo.ArtículoTipoId">@artículoTipo.Nombre</option>}
+								</select>
+							</div>
+
+							<div class="form-group col-md-8">
+								<label for="SubTipoArtículo" class="control-label">Sub Tipo Artículo</label>
+
+								<select value=@ActualArtículoSubTipoId class="form-control" @onchange="ArtículoSubTipoClicked">
+									<option value="">-- Seleccione el subtipo de artículo --</option>
+
+									@if (LosArtículoSubTipos != null)
+									{
+
+					@foreach (var artículoSubTipo in LosArtículoSubTipos)
+					{
+					<option value="@artículoSubTipo.ArtículoSubTipoId">@artículoSubTipo.Nombre</option>}}
+								</select>
+
+							</div>
+						</div>
+
+						@*Descripción*@
+						<div class="form-row">
+							<div class="form-group col-md-8">
+								<label for="Descripción" class="control-label">Descripción</label>
+								<InputText id="Descripción" class="form-control" @bind-Value="ElArtículo.Descripción">
+								</InputText>
+								<ValidationMessage For="@(() => ElArtículo.Descripción)" />
+							</div>
+						</div>
+
+						@*Precio*@
+						<div class="form-row">
+							<div class="form-group col-md-4">
+								<label for="Precio" class="control-label">Precio</label>
+								<InputNumber id="Precio" class="form-control" placeholder="Precio" @bind-Value="ElArtículo.Precio" />
+								<ValidationMessage For="@(() => ElArtículo.Precio)" />
+							</div>
+						</div>
+
+						<hr />
+						@*Botones*@
+						<div class="form-group">
+							<button type="submit" class="btn btn-success">Save</button>
+							<button class="btn btn-primary" @onclick="CerrarFormaModal">Cancel</button>
+						</div>
+					</EditForm>
+				</div>
+
+			</BSModalBody>
+		</BSModal>
+	</div>
+
+
+	<div>
+		<BSModal @bind-IsOpen="EsVer" Size="Size.Large" IgnoreEscape="true" IgnoreClickOnBackdrop="true">
+			<BSModalHeader @onclick="CerrarFormaModal">@ModalTitle</BSModalHeader>
+			<BSModalBody>
+
+				<h1>Soy Vista</h1>
+
+				<div class="col-md-12">
+					@if (EsEliminar)
+					{
+						<BSAlert Color="Color.Danger">Revise con cuidado antes de eliminar el artículo.</BSAlert>
+					}
+					<hr />
+					<h5>Demographic Data</h5>
+					<hr />
+
+					<br />
+					<BSTable IsResponsive="true" class="table">
+						<tr>
+							<td>Artículo Id</td>
+							<td>@ElArtículo.ArtículoId</td>
+						</tr>
+						<tr>
+							<td>Nombre</td>
+							<td>@ElArtículo.Nombre</td>
+						</tr>
+						<tr>
+							<td>Precio</td>
+							<td class="monto">@ElArtículo.Precio.ToString("C")</td>
+						</tr>
+						<tr>
+							<td>Fecha de Creación</td>
+							<td>@ElArtículo.FechaDeCreación</td>
+						</tr>
+						<tr>
+							<td>Fecha de Modificación</td>
+							<td>@ElArtículo.FechaDeModificación</td>
+						</tr>
+					</BSTable>
+
+					<hr />
+
+					<div class="form-group">
+						@if (EsEliminar)
+						{
+							<button type="button" class="btn btn-danger" @onclick="(async () => await Eliminar(ElArtículo.ArtículoId))">Eliminar</button>
+							<button class="btn btn-primary" @onclick="CerrarFormaModal">Cancel</button>
+						}
+						@if (!EsEliminar)
+						{
+							<button class="btn btn-primary" @onclick="CerrarFormaModal">Back</button>
+						}
+					</div>
+				</div>
+
+			</BSModalBody>
+		</BSModal>
+	</div>
+}

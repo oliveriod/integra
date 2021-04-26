@@ -1,0 +1,60 @@
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
+
+	<div class="top-row pl-4 navbar navbar-dark">
+		<a class="navbar-brand" href="">Blazor Server App</a>
+	</div>
+
+
+<BlazoredMenu MenuBuilder="@MenuBuilder" />
+
+@code {
+	MenuBuilder MenuBuilder = new MenuBuilder();
+	private bool IsOpen { get; set; } = true;
+	private List<Menu> ElMenu = new List<Menu>()
+		{
+		new Menu(2,"Dashboard", "/dashboard", ""),
+		new Menu(3,"Artículos", "articulo", ""),
+		new Menu(4, "Clientes", "cliente", ""),
+		new Menu(5, "Proyectos", "proyecto", ""),
+		new Menu(6, "Cotizaciones", "cotizacion", ""),
+		new Menu(7, "Nueva Cotización", "cotizacion/nueva", ""),
+		new Menu(41, "Pruebas", "pruebas", ""),
+		new Menu(42, "Pruebas TA", "pruebasta", ""),
+		new Menu(43, "Pruebas Razor", "pruebascomponentes", "")
+	};
+
+
+
+	protected override void OnInitialized()
+	{
+
+		MenuBuilder.AddItem(1, "Home", "/", match: NavLinkMatch.All);
+
+		foreach (var item in ElMenu)
+		{
+			MenuBuilder.AddItem(item.Orden, item.Texto, item.Enlace);
+		}
+		MenuBuilder.AddIconCssToClose("oi oi-chevron-top pt-3")
+				   .AddIconCssToOpen("oi oi-chevron-bottom pt-3")
+		;
+
+	}
+
+	void onclick(MouseEventArgs e)
+	{
+		IsOpen = !IsOpen;
+		StateHasChanged();
+	}
+
+	void OpenChanged(bool e)
+	{
+		IsOpen = e;
+		StateHasChanged();
+	}
+
+	protected bool isLoggedOn()
+	{
+		//TODO		return (localStorage.GetItem<string>("JWT-Token") != String.Empty && DateTime.Now.Ticks < Convert.ToInt64(localStorage.GetItem<string>("JWT-Time-Expire")));
+		return true;
+	}
+}

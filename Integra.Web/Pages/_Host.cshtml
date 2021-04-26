@@ -1,0 +1,35 @@
+@page "/"
+@namespace Integra.Web.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Integra.Web</title>
+	<base href="~/" />
+	<link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+	<link href="_content/Blazored.Toast/blazored-toast.min.css" rel="stylesheet" />
+	<link href="_content/Blazored.Typeahead/blazored-typeahead.css" rel="stylesheet" />
+	<link href="_content/Blazored.Menu/blazored-menu.css" rel="stylesheet" />
+	<link href="css/site.css" rel="stylesheet" />
+	<link href="css/blazored-menu.css" rel="stylesheet" />
+	<link href="Integra.Web.styles.css" rel="stylesheet" />
+
+	<script src="_content/BlazorStrap/blazorStrap.js"></script>
+
+</head>
+
+
+<body>
+	<component type="typeof(App)" render-mode="ServerPrerendered" />
+
+	<script src="_framework/blazor.server.js"></script>
+	<script src="_content/Blazored.Typeahead/blazored-typeahead.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+﻿
+@if (Result != null)
+{
+
+	var prevDisabled = @Result.HasPreviousPage ? "" : "disabled";
+	var nextDisabled = @Result.HasNextPage ? "" : "disabled";
+	string laClasePrev = "btn btn-default " + @prevDisabled;
+	string laClaseNext = "btn btn-default " + nextDisabled;
+
+	<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class=@laClasePrev @onclick="@( () => MiPaginadorButtonClicked(Result.PáginaAnterior))">Anterior</BSButton>
+	<BSButton ButtonType="ButtonType.Link" Color="Color.None" Class=@laClaseNext @onclick="@( () => MiPaginadorButtonClicked(Result.PáginaSiguiente))">Siguiente</BSButton>
+
+}
+
+
+
+@code {
+	[Parameter]
+	public PaginatedListBase Result { get; set; }
+
+	[Parameter]
+	public Action<int> PageChanged { get; set; }
+
+	protected void MiPaginadorButtonClicked(int page)
+	{
+		PageChanged?.Invoke(page);
+	}
+
+}
+

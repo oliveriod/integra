@@ -1,0 +1,57 @@
+﻿@inherits CotizacionDetalleBase
+@page "/cotizacion/{cotizaciónId:int}"
+
+<h3>Prueba de cotizaciones con API</h3>
+
+@if (Cotización == null)
+{
+	<p><em>Cargando la cotización @CotizaciónId...</em></p>
+}
+else
+{
+	<h1>Cotización @Cotización.CotizaciónId</h1>
+	<br />
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Cliente</th>
+				<th>Proyecto</th>
+				<th>Vendedor</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>@Cotización.ClienteNombreCompleto</td>
+				<td>@Cotización.ProyectoNombre</td>
+				<td>@Cotización.VendedorNombreCompleto</td>
+			</tr>
+		</tbody>
+	</table>
+
+<br />
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Línea</th>
+				<th>Artículo</th>
+				<th>Cantidad</th>
+				<th>Precio</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var línea in Cotización.Líneas)
+			{
+			<tr>
+				<td>@línea.NúmeroDeLinea</td>
+				<td>@línea.ArtículoNombre</td>
+				<td>@línea.Cantidad</td>
+				<td>@línea.PrecioUnitario</td>
+			</tr>
+
+			}
+		</tbody>
+	</table>
+
+
+}
