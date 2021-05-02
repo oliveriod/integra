@@ -1,3 +1,4 @@
+using Integra.API.Services;
 using Integra.DataAccess;
 using Integra.DataAccess.Repositories;
 using Integra.Shared.Domain;
@@ -35,23 +36,28 @@ namespace Integra.API
 
 			CreateInitialDatabase(opcionesParaDB);
 
+
+			// DbContext
 			services.AddDbContext<IntegraDbContext>(options => options.UseSqlite(connection));
 
-			services.AddScoped<IAcciónDeInventarioRepository, AcciónDeInventarioRepository>();
 
+			// Repositorios
+			services.AddScoped<IAcciónDeInventarioRepository, AcciónDeInventarioRepository>();
 			services.AddScoped<IArtículoRepository, ArtículoRepository>();
 			services.AddScoped<IArtículoSubTipoRepository, ArtículoSubTipoRepository>();
 			services.AddScoped<IArtículoTipoRepository, ArtículoTipoRepository>();
-
 			services.AddScoped<IInventarioRepository, InventarioRepository>();
 			services.AddScoped<IRecetaRepository, RecetaRepository>();
-
 			services.AddScoped<IClienteRepository, ClienteRepository>();
 			services.AddScoped<ICotizaciónRepository, CotizaciónRepository>();
 			services.AddScoped<IProveedorRepository, ProveedorRepository>();
 			services.AddScoped<IProyectoRepository, ProyectoRepository>();
 			services.AddScoped<IGenéricoRepository<CotizaciónLínea>, CotizaciónLíneaRepository>();
 
+			// Servicios (BLL)
+			services.AddScoped<IArtículoService, ArtículoService>();
+
+			// Automapper (por si acaso)
 			services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 

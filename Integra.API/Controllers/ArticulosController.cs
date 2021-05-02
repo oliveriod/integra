@@ -1,5 +1,5 @@
 using AutoMapper;
-using Integra.DataAccess.Repositories;
+using Integra.API.Services;
 using Integra.Shared.Base;
 using Integra.Shared.Domain;
 using Integra.Shared.DTO;
@@ -16,27 +16,26 @@ namespace Integra.API
 	{
 		private readonly IMapper _mapper;
 		private readonly ILogger<Artículo> _logger;
-		private readonly IArtículoRepository _artículoRepository;
+		private readonly IArtículoService _artículoService;
 
 		public ArticulosController(
 			IMapper mapper,
 			ILogger<Artículo> logger,
-			IArtículoRepository artículoRepository)
+			IArtículoService artículoService)
 		{
 			_mapper = mapper;
 			_logger = logger;
-			_artículoRepository = artículoRepository;
+			_artículoService = artículoService;
 		}
 
 		[HttpPut]
 		[ActionName("Actualizar")]
 		public IActionResult Actualizar([FromBody] Artículo algoParaActualizar)
 		{
-			var resultado = _artículoRepository.Actualizar(algoParaActualizar);
+			var resultado = _artículoService.Actualizar(algoParaActualizar);
 
 			if (resultado == null)
 				return NotFound();
-			_artículoRepository.SaveChanges();
 
 			return Ok(_mapper.Map<ArtículoDto>(resultado));
 		}
@@ -47,11 +46,10 @@ namespace Integra.API
 		{
 			try
 			{
-				var resultado = _artículoRepository.Adicionar(algoParaAdicionar);
+				var resultado = _artículoService.Adicionar(algoParaAdicionar);
 
 				if (resultado == null)
 					return NotFound();
-				_artículoRepository.SaveChanges();
 
 				return Ok(_mapper.Map<ArtículoDto>(resultado));
 			}
@@ -69,7 +67,7 @@ namespace Integra.API
 		{
 			try
 			{
-				_artículoRepository.Eliminar(algoParaEliminar);
+				_artículoService.Eliminar(algoParaEliminar);
 			}
 			catch (Exception ex)
 			{
@@ -90,9 +88,7 @@ namespace Integra.API
 			else
 				elWhere = n => n.Nombre.ToLower().Contains(loquebusco.ToLower()) || n.Código.ToLower().Contains(loquebusco.ToLower());
 
-			var LaRespuesta = _artículoRepository.TraerVariosPTAAsync(elWhere, o => o.Nombre, cuantospp);
-
-			var resultado = LaRespuesta.Result;
+			var resultado = _artículoService.TraerAyuda(loquebusco, cuantospp);
 
 			if (resultado == null)
 				return NotFound();
@@ -104,18 +100,8 @@ namespace Integra.API
 		[ActionName("TraerPagina")]
 		public IActionResult TraerPagina([FromQuery] string loquebusco, int pagina, int cuantospp = 10)
 		{
-			Expression<Func<Artículo, bool>> elWhere;
-			if (string.IsNullOrEmpty(loquebusco))
-				elWhere = null;
-			else
-				elWhere = n => n.Nombre.ToLower().Contains(loquebusco.ToLower()) || n.Código.ToLower().Contains(loquebusco.ToLower());
 
-			var LaRespuesta = _artículoRepository.TraerVariosAsync(elWhere
-						, o => o.Nombre
-						, new List<string> { "ArtículoSubTipo", "ArtículoSubTipo.ArtículoTipo" }
-						, pagina, cuantospp);
-
-			var resultado = LaRespuesta.Result;
+			var resultado = _artículoService.TraerPagina(loquebusco	, pagina, cuantospp);
 
 			if (resultado == null)
 				return NotFound();
@@ -127,10 +113,9 @@ namespace Integra.API
 		[ActionName("TraerUnoPorId")]
 		public IActionResult TraerUnoPorId(int artículoId)
 		{
-			var LaRespuesta = _artículoRepository.TraerUnoAsync(a=> a.ArtículoId == artículoId, new List<string> { "ArtículoSubTipo", "ArtículoSubTipo.ArtículoTipo" });
-			if (LaRespuesta == null)
+			var resultado = _artículoService.TraerUnoPorId(artículoId);
+			if (resultado == null)
 				return NotFound();
-			var resultado = LaRespuesta.Result;
 
 			return Ok(_mapper.Map<ArtículoDto>(resultado));
 		}

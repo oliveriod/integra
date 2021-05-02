@@ -10,10 +10,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Integra.API.BLL
+namespace Integra.API.Services
 {
 
-	public class ArtículoService
+	public class ArtículoService : IArtículoService
 	{
 		private readonly IntegraDbContext _context;
 		private readonly IMapper _mapper;
@@ -42,7 +42,7 @@ namespace Integra.API.BLL
 			_acciónDeInventarioRepository = acciónDeInventarioRepository;
 		}
 
-		public Artículo Actualizar([FromBody] Artículo algoParaActualizar)
+		public Artículo Actualizar(Artículo algoParaActualizar)
 		{
 			var resultado = _artículoRepository.Actualizar(algoParaActualizar);
 
@@ -53,7 +53,7 @@ namespace Integra.API.BLL
 			return resultado;
 		}
 
-		public Artículo Adicionar([FromBody] Artículo algoParaAdicionar)
+		public Artículo Adicionar(Artículo algoParaAdicionar)
 		{
 			try
 			{
@@ -73,7 +73,7 @@ namespace Integra.API.BLL
 			}
 		}
 
-		public bool Eliminar([FromBody] Artículo algoParaEliminar)
+		public bool Eliminar( Artículo algoParaEliminar)
 		{
 			try
 			{
@@ -88,7 +88,7 @@ namespace Integra.API.BLL
 			return true;
 		}
 
-		public IEnumerable<Artículo> TraerAyuda([FromQuery] string loquebusco, int cuantospp = 50)
+		public IEnumerable<Artículo> TraerAyuda(string loquebusco, int cuantospp = 50)
 		{
 			Expression<Func<Artículo, bool>> elWhere;
 			if (string.IsNullOrEmpty(loquebusco))
@@ -104,7 +104,7 @@ namespace Integra.API.BLL
 		}
 
 
-		public PaginatedList<Artículo> TraerPagina([FromQuery] string loquebusco, int pagina, int cuantospp = 10)
+		public PaginatedList<Artículo> TraerPagina( string loquebusco, int pagina, int cuantospp = 10)
 		{
 			Expression<Func<Artículo, bool>> elWhere;
 			if (string.IsNullOrEmpty(loquebusco))
@@ -125,7 +125,7 @@ namespace Integra.API.BLL
 
 		public Artículo TraerUnoPorId(int artículoId)
 		{
-			var LaRespuesta = _artículoRepository.TraerUnoAsync(a=>a.ArtículoId == artículoId, new List<string> { "ArtículoSubTipo", "ArtículoSubTipo.ArtículoTipo" });
+			var LaRespuesta = _artículoRepository.TraerUnoAsync(a => a.ArtículoId == artículoId, new List<string> { "ArtículoSubTipo", "ArtículoSubTipo.ArtículoTipo" });
 
 			return LaRespuesta.Result;
 		}
@@ -242,7 +242,7 @@ namespace Integra.API.BLL
 
 
 
-		}
-
-
 	}
+
+
+}
