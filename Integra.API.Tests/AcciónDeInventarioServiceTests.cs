@@ -13,14 +13,18 @@ using Xunit.Abstractions;
 
 namespace Integra.API.Tests
 {
-	public class AcciónDeInventarioBLLTests
+	public class AcciónDeInventarioServiceTests
 	{
 		private readonly ITestOutputHelper _output;
 
-		public AcciónDeInventarioBLLTests(ITestOutputHelper output)
+		public AcciónDeInventarioServiceTests(ITestOutputHelper output)
 		{
 			_output = output;
 		}
+
+
+
+
 
 		[Fact]
 		public void InsertarAcciónDeInventario_NadaRaro_RetornaId_1()

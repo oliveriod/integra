@@ -16,7 +16,6 @@ namespace Integra.API.Services
 	public class ArtículoService : IArtículoService
 	{
 		private readonly IntegraDbContext _context;
-		private readonly IMapper _mapper;
 		private readonly ILogger<Artículo> _logger;
 		private readonly IArtículoRepository _artículoRepository;
 		private readonly IInventarioRepository _inventarioRepository;
@@ -25,7 +24,6 @@ namespace Integra.API.Services
 
 		public ArtículoService(
 			IntegraDbContext context,
-			IMapper mapper,
 			ILogger<Artículo> logger,
 			IArtículoRepository artículoRepository,
 			IInventarioRepository inventarioRepository,
@@ -34,7 +32,6 @@ namespace Integra.API.Services
 			)
 		{
 			_context = context;
-			_mapper = mapper;
 			_logger = logger;
 			_artículoRepository = artículoRepository;
 			_recetaRepository = recetaRepository;
