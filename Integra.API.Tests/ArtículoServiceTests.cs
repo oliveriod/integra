@@ -106,7 +106,7 @@ namespace Integra.API.Tests
 		[Theory]
 		[InlineData(1, 4, 4)]
 		[InlineData(2, 3, 0)]
-		public void ProcesarRecetas(uint Receta, int CantidadAProducir, int CantidadProducida)
+		public void ProcesarRecetas(ushort Receta, int CantidadAProducir, int CantidadProducida)
         {
 			// Arrange
 			var connectionStringBuilder =
@@ -123,11 +123,9 @@ namespace Integra.API.Tests
 				context.Database.EnsureCreated();
 
 
-                var loggerMock = new Mock<ILogger<Artículo>>();
                 var artículoRepository = new ArtículoRepository(context);
                 var inventarioRepository = new InventarioRepository(context);
                 var recetaRepository = new RecetaRepository(context);
-                var acciónDeInventarioRepository = new AcciónDeInventarioRepository(context);
 
 
                 // Crear artículos
@@ -147,47 +145,52 @@ namespace Integra.API.Tests
 				recetaRepository.Adicionar(new Receta { RecetaId = 1, Nombre = "Helado de nueces y chocolate", ArtículoId = 101,
                 RecetaDetalles = new List<RecetaDetalle>()
                     {
-                        new RecetaDetalle { RecetaId = 1, ArtículoId = 3, Cantidad = 110},
-                        new RecetaDetalle { RecetaId = 1, ArtículoId = 5,  Cantidad = 500},
-                        new RecetaDetalle { RecetaId = 1, ArtículoId = 9, Cantidad = 100}
+                        new RecetaDetalle { RecetaId = 1, ArtículoId = 3, Cantidad = 100},
+                        new RecetaDetalle { RecetaId = 1, ArtículoId = 5,  Cantidad = 200},
+                        new RecetaDetalle { RecetaId = 1, ArtículoId = 9, Cantidad = 300}
 
                     }
                 });
 				recetaRepository.Adicionar(new Receta { RecetaId = 2, Nombre = "Helado de Avellanas", ArtículoId = 102,
                 RecetaDetalles =    new List<RecetaDetalle>()
                     {
-                        new RecetaDetalle { RecetaId = 2, ArtículoId = 3, Cantidad = 110},
-                        new RecetaDetalle { RecetaId = 2, ArtículoId = 4,  Cantidad = 500},
-                        new RecetaDetalle { RecetaId = 2, ArtículoId = 7, Cantidad = 100}
+                        new RecetaDetalle { RecetaId = 2, ArtículoId = 1, Cantidad = 200},
+                        new RecetaDetalle { RecetaId = 2, ArtículoId = 4,  Cantidad = 300},
+                        new RecetaDetalle { RecetaId = 2, ArtículoId = 7, Cantidad = 200}
                     }
                  });
 
                 //  Llenar el inventario para las pruebas
+				inventarioRepository.Adicionar(new Inventario { BodegaId=1, UbicaciónId=1, ArtículoId = 3, Cantidad=400, UnidadId = 1 });
+				inventarioRepository.Adicionar(new Inventario { BodegaId=1, UbicaciónId=1, ArtículoId = 5, Cantidad=800, UnidadId = 1 });
+				inventarioRepository.Adicionar(new Inventario { BodegaId=1, UbicaciónId=1, ArtículoId = 9, Cantidad=1200, UnidadId = 1 });
+
+				inventarioRepository.Adicionar(new Inventario { BodegaId=1, UbicaciónId=1, ArtículoId = 1, Cantidad=600, UnidadId = 1 });
+				inventarioRepository.Adicionar(new Inventario { BodegaId=1, UbicaciónId=1, ArtículoId = 4, Cantidad=900, UnidadId = 1 });
+				inventarioRepository.Adicionar(new Inventario { BodegaId=1, UbicaciónId=1, ArtículoId = 7, Cantidad=400, UnidadId = 1 });
 
 
-
-                var servicio = new ArtículoService(context, loggerMock.Object, artículoRepository, inventarioRepository, recetaRepository, acciónDeInventarioRepository);
- 
-
-
-				context.Clientes.Add(new Cliente() { Nombre = "Katy", PrimerApellido = "Perry" });
-				context.Clientes.Add(new Cliente() { Nombre = "Juana", PrimerApellido = "Mayo" });
-				context.Clientes.Add(new Cliente() { Nombre = "Anacaona", PrimerApellido = "Perry" });
-				context.Clientes.Add(new Cliente() { Nombre = "Cenicienta", PrimerApellido = "Perry" });
-				context.Clientes.Add(new Cliente() { Nombre = "Katy", PrimerApellido = "Fernández" });
-				context.Clientes.Add(new Cliente() { Nombre = "Katy", PrimerApellido = "Pérez" });
-				context.Clientes.Add(new Cliente() { Nombre = "Katy", PrimerApellido = "González" });
 
 				context.SaveChanges();
 			}
 
 			using (var context = new IntegraDbContext(options))
 			{
-				var repositorio = new ClienteRepository(context);
+                var loggerMock = new Mock<ILogger<Artículo>>();
+                var artículoRepository = new ArtículoRepository(context);
+                var inventarioRepository = new InventarioRepository(context);
+                var recetaRepository = new RecetaRepository(context);
+                var acciónDeInventarioRepository = new AcciónDeInventarioRepository(context);
+
 
 				//	Act
+                var servicio = new ArtículoService(context, loggerMock.Object, artículoRepository, inventarioRepository, recetaRepository, acciónDeInventarioRepository);
+
+				servicio.Producir(Receta, CantidadAProducir, 1);
 
 				//	Assert
+
+				
 			}
 		}
 
