@@ -119,7 +119,7 @@ namespace Integra.API.Controllers
 		[ActionName("TraerTodos")]
 		public IActionResult TraerTodos()
 		{
-			var LaRespuesta = _artículoTipoRepository.TraerTodosAsync( o => o.Nombre);
+			var LaRespuesta = _artículoTipoRepository.TraerTodosAsync(null, o => o.Nombre);
 
 			var resultado = LaRespuesta.Result;
 

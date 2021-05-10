@@ -7,6 +7,9 @@ namespace Integra.Shared.Domain
 	{
 		public ushort UbicaciónId { get; set; }
 
+		public ushort BodegaId { get; set; }
+		public Bodega Bodega { get; set; }
+
 		[Required]
 		[StringLength(20)]
 		public string Código { get; set; }

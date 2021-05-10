@@ -20,6 +20,8 @@ namespace Integra.API.Services
 		private readonly IArtículoRepository _artículoRepository;
 		private readonly IInventarioRepository _inventarioRepository;
 		private readonly IRecetaRepository _recetaRepository;
+		private readonly IBodegaRepository _bodegaRepository;
+		private readonly IUbicaciónRepository _ubicaciónRepository;
 		private readonly IAcciónDeInventarioRepository _acciónDeInventarioRepository;
 
 		public ArtículoService(
@@ -50,7 +52,7 @@ namespace Integra.API.Services
 			return resultado;
 		}
 
-		public Artículo Adicionar(Artículo algoParaAdicionar)
+		public Artículo AdicionarArtículo(Artículo algoParaAdicionar)
 		{
 			try
 			{
@@ -58,7 +60,20 @@ namespace Integra.API.Services
 
 				if (resultado == null)
 					return null;
-				_artículoRepository.SaveChanges();
+
+				// Crear el artículo en todas las bodegas y ubicaciones
+				var LasBodegas = _bodegaRepository.TraerTodos(b=> b.Sucursal.EmpresaId == algoParaAdicionar.EmpresaId);
+				foreach (Bodega bodega in LasBodegas)
+				{
+					var LasUbicaciones = _ubicaciónRepository.TraerTodos(u=> u.BodegaId == bodega.BodegaId);
+					foreach (Ubicación ubicación in LasUbicaciones)
+					{
+						Inventario UnInventario = new Inventario { BodegaId = bodega.BodegaId, UbicaciónId=ubicación.UbicaciónId, ArtículoId = algoParaAdicionar.ArtículoId, UnidadId = algoParaAdicionar.UnidadId, Cantidad = 0, EstadoId = EstadoEnum.Activo };
+						var resultadoInventario = _inventarioRepository.Adicionar(UnInventario);
+					}
+				}
+
+				_context.SaveChanges();
 
 				return resultado;
 			}
@@ -69,7 +84,40 @@ namespace Integra.API.Services
 				return null;
 			}
 		}
+		public Ubicación AdicionarUbicación(Ubicación algoParaAdicionar)
+		{
+			try
+			{
+				var resultado = _ubicaciónRepository.Adicionar(algoParaAdicionar);
 
+				if (resultado == null)
+					return null;
+
+				// Crear todos los artículos en la nueva ubicación
+
+				Expression<Func<Artículo, bool>> elWhereDeArtículos;
+				elWhereDeArtículos = a => a.EmpresaId == algoParaAdicionar.Bodega.Sucursal.EmpresaId;
+
+				var LosArtículos = _artículoRepository.TraerTodos(elWhereDeArtículos);
+				foreach (Artículo artículo in LosArtículos)
+				{
+					{
+						Inventario UnInventario = new Inventario { BodegaId = algoParaAdicionar.BodegaId, UbicaciónId = algoParaAdicionar.UbicaciónId, ArtículoId = artículo.ArtículoId, UnidadId = artículo.UnidadId, Cantidad = 0, EstadoId = EstadoEnum.Activo };
+						var resultadoInventario = _inventarioRepository.Adicionar(UnInventario);
+					}
+				}
+
+				_context.SaveChanges();
+
+				return resultado;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex.Message);
+				_logger.LogError(ex.StackTrace);
+				return null;
+			}
+		}
 		public bool Eliminar( Artículo algoParaEliminar)
 		{
 			try

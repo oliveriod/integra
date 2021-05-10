@@ -31,14 +31,6 @@ namespace Integra.DataAccess.Repositories
 		}
 
 
-		public override IEnumerable<Cotización> TraerTodos()
-		{
-			return _context.Cotizaciones
-				.Include(cotización => cotización.Cliente)
-				.Include(cotización => cotización.Vendedor)
-				.Include(cotización => cotización.Proyecto)
-				.ToList();
-		}
 
 		public override Cotización TraerUnoPorId(uint cotizaciónId)
 		{

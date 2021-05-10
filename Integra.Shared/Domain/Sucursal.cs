@@ -8,7 +8,7 @@ namespace Integra.Shared.Domain
 		public ushort SucursalId { get; set; }
 
 		[Required]
-		public byte EmpresaId { get; set; }
+		public ushort EmpresaId { get; set; }
 		public Empresa Empresa { get; set; }
 
 		[Required]

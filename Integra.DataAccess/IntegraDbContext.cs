@@ -11,7 +11,7 @@ namespace Integra.DataAccess
 	public class IntegraDbContext : DbContext
 	{
 		public DbSet<AcciónDeInventario> AccionesDeInventario { get; set; }
-		public DbSet<AcciónDeInventarioDetalle> AccionesDeInventarioDetalle	 { get; set; }
+		public DbSet<AcciónDeInventarioDetalle> AccionesDeInventarioDetalle { get; set; }
 
 		public DbSet<Artículo> Artículos { get; set; }
 		public DbSet<ArtículoTipo> ArtículoTipos { get; set; }
@@ -138,6 +138,12 @@ namespace Integra.DataAccess
 			.HasKey(o => new { o.Columna })
 			;
 
+			// Ubicación
+			modelBuilder.Entity<Ubicación>()
+				.HasKey(o => new { o.BodegaId, o.Código })
+				;
+
+
 			//	UnidadConversión
 			modelBuilder.Entity<UnidadConversión>()
 			.HasKey(o => new { o.UnidadOrigenId, o.UnidadDestinoId })
@@ -180,7 +186,7 @@ namespace Integra.DataAccess
 				new Secuencia { Columna = "ArtículoId", ValorActual = 0 },
 				new Secuencia { Columna = "BodegaId", ValorActual = 2 },
 				new Secuencia { Columna = "ClienteId", ValorActual = 0 },
-				new Secuencia { Columna = "EmpresaId", ValorActual = 2},
+				new Secuencia { Columna = "EmpresaId", ValorActual = 2 },
 				new Secuencia { Columna = "RecetaId", ValorActual = 0 },
 				new Secuencia { Columna = "SucursalId", ValorActual = 4 },
 				new Secuencia { Columna = "UbicaciónId", ValorActual = 1 }
@@ -201,9 +207,15 @@ namespace Integra.DataAccess
 			);
 
 			modelBuilder.Entity<Bodega>().HasData(
-				new Bodega { BodegaId = 1, Código = "SB", Descripción = "Sin Bodega", SucursalId = 1, ParaLaVenta = false },
-				new Bodega { BodegaId = 2, Código="MP", Descripción = "Materia Prima", SucursalId = 1, ParaLaVenta = false },
-				new Bodega { BodegaId = 3, Código="PT", Descripción = "Producto Terminado", SucursalId = 1, ParaLaVenta = true }
+				new Bodega { BodegaId = 1, SucursalId = 1, Código = "SB", Descripción = "Sin Bodega"		, ParaLaVenta = false },
+				new Bodega { BodegaId = 2, SucursalId = 1, Código = "MP", Descripción = "Materia Prima"		, ParaLaVenta = false },
+				new Bodega { BodegaId = 3, SucursalId = 1, Código = "PT", Descripción = "Producto Terminado", ParaLaVenta = true }
+				);
+
+			modelBuilder.Entity<Ubicación>().HasData(
+				new Ubicación { UbicaciónId = 1, BodegaId = 1, Código = "S/U", Descripción = "Sin ubicación", EstadoId = EstadoEnum.Activo },
+				new Ubicación { UbicaciónId = 2, BodegaId = 2, Código = "S/U", Descripción = "Sin ubicación", EstadoId = EstadoEnum.Activo },
+				new Ubicación { UbicaciónId = 3, BodegaId = 3, Código = "S/U", Descripción = "Sin ubicación", EstadoId = EstadoEnum.Activo }
 				);
 
 			modelBuilder.Entity<Unidad>().HasData(
@@ -219,13 +231,13 @@ namespace Integra.DataAccess
 				);
 
 			modelBuilder.Entity<UnidadConversión>().HasData(
-				new UnidadConversión { UnidadOrigenId = 12, UnidadDestinoId = 11, FactorDeConversión = 1000, Nombre= "litro a mililitro" },
-				new UnidadConversión { UnidadOrigenId = 14, UnidadDestinoId = 13, FactorDeConversión = 1000, Nombre= "kilogramo a gramo" },
-				new UnidadConversión { UnidadOrigenId = 51, UnidadDestinoId = 50, FactorDeConversión = 128, Nombre="galón a onza" }
+				new UnidadConversión { UnidadOrigenId = 12, UnidadDestinoId = 11, FactorDeConversión = 1000, Nombre = "litro a mililitro" },
+				new UnidadConversión { UnidadOrigenId = 14, UnidadDestinoId = 13, FactorDeConversión = 1000, Nombre = "kilogramo a gramo" },
+				new UnidadConversión { UnidadOrigenId = 51, UnidadDestinoId = 50, FactorDeConversión = 128, Nombre = "galón a onza" }
 				);
 
 			// Valores por defecto
-			modelBuilder.Entity<Ubicación>().HasData(	new Ubicación { UbicaciónId = 1, Descripción = "Sin Ubicación", Código = "SU000000" });
+			modelBuilder.Entity<Ubicación>().HasData(new Ubicación { UbicaciónId = 1, Descripción = "Sin Ubicación", Código = "SU000000" });
 			modelBuilder.Entity<Vendedor>().HasData(new Vendedor { VendedorId = 1, Nombre = "Sin Vendedor", TipoEnteId = TipoEnteEnum.PorDefecto, EstadoId = EstadoEnum.Activo });
 			modelBuilder.Entity<Cliente>().HasData(new Cliente { ClienteId = 1, Nombre = "Contado", TipoEnteId = TipoEnteEnum.PorDefecto, EstadoId = EstadoEnum.Activo });
 
@@ -257,7 +269,7 @@ namespace Integra.DataAccess
 
 		private static void SeedArtículosData(ModelBuilder modelBuilder)
 		{
-			
+
 			modelBuilder.Entity<Artículo>().HasData(
 				new Artículo { ArtículoId = 1, ArtículoSubTipoId = 1, UnidadId = 11, Código = "LEC001", Nombre = "Leche Entera", EstadoId = EstadoEnum.Activo },
 				new Artículo { ArtículoId = 2, ArtículoSubTipoId = 2, UnidadId = 11, Código = "LCO001", Nombre = "Leche condensada", EstadoId = EstadoEnum.Activo },
@@ -282,10 +294,10 @@ namespace Integra.DataAccess
 
 
 			modelBuilder.Entity<Inventario>().HasData(
-				new Inventario { BodegaId = 1, ArtículoId = 11, UnidadId = 13, Cantidad = 10000, EstadoId = EstadoEnum.Activo },
-				new Inventario { BodegaId = 1, ArtículoId = 3, UnidadId = 11, Cantidad = 10000, EstadoId = EstadoEnum.Activo },
-				new Inventario { BodegaId = 1, ArtículoId = 13, UnidadId = 13, Cantidad = 10000, EstadoId = EstadoEnum.Activo },
-				new Inventario { BodegaId = 1, ArtículoId = 6, UnidadId = 13, Cantidad = 10000, EstadoId = EstadoEnum.Activo }
+				new Inventario { BodegaId = 1, UbicaciónId = 1, ArtículoId = 11, UnidadId = 13, Cantidad = 10000, EstadoId = EstadoEnum.Activo },
+				new Inventario { BodegaId = 1, UbicaciónId = 1, ArtículoId = 3, UnidadId = 11, Cantidad = 10000, EstadoId = EstadoEnum.Activo },
+				new Inventario { BodegaId = 1, UbicaciónId = 1, ArtículoId = 13, UnidadId = 13, Cantidad = 10000, EstadoId = EstadoEnum.Activo },
+				new Inventario { BodegaId = 1, UbicaciónId = 1, ArtículoId = 6, UnidadId = 13, Cantidad = 10000, EstadoId = EstadoEnum.Activo }
 				);
 		}
 
@@ -295,15 +307,15 @@ namespace Integra.DataAccess
 		private static void SeedRecetasData(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Receta>().HasData(
-				new Receta { RecetaId = 1, Nombre = "Helado de nueces y chocolate", ArtículoId = 101,  },
+				new Receta { RecetaId = 1, Nombre = "Helado de nueces y chocolate", ArtículoId = 101, },
 				new Receta { RecetaId = 2, Nombre = "Helado de Avellanas", ArtículoId = 102 }
 				);
 
 			modelBuilder.Entity<RecetaDetalle>().HasData(
-				new RecetaDetalle { RecetaId = 1, ArtículoId = 11, Cantidad = 110},
-				new RecetaDetalle { RecetaId = 1, ArtículoId = 3,  Cantidad = 500},
-				new RecetaDetalle { RecetaId = 1, ArtículoId = 13, Cantidad = 100},
-				new RecetaDetalle { RecetaId = 1, ArtículoId = 6,  Cantidad = 70}
+				new RecetaDetalle { RecetaId = 1, ArtículoId = 11, Cantidad = 110 },
+				new RecetaDetalle { RecetaId = 1, ArtículoId = 3, Cantidad = 500 },
+				new RecetaDetalle { RecetaId = 1, ArtículoId = 13, Cantidad = 100 },
+				new RecetaDetalle { RecetaId = 1, ArtículoId = 6, Cantidad = 70 }
 				);
 		}
 

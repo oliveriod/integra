@@ -17,8 +17,9 @@ namespace Integra.DataAccess.Repositories
 		void EliminarVarios(IEnumerable<T> entities);
 		bool Existe(uint id);
 		void SaveChanges();
-		IEnumerable<T> TraerTodos();
-		Task<List<T>> TraerTodosAsync(Expression<Func<T, string>> elOrderBy);
+		IEnumerable<T> TraerTodos(Expression<Func<T, bool>> elWhere);
+		IEnumerable<T> TraerTodos(Expression<Func<T, bool>> elWhere, Expression<Func<T, string>> elOrderBy);
+		Task<List<T>> TraerTodosAsync(Expression<Func<T, bool>> elWhere, Expression<Func<T, string>> elOrderBy);
 		Task<T> TraerUnoAsync(Expression<Func<T, bool>> elWhere);
 		Task<T> TraerUnoAsync(Expression<Func<T, bool>> elWhere, IList<string> losIncludes);
 		T TraerUnoPorId(ulong id);

@@ -189,6 +189,7 @@ namespace Integra.API.Tests
 				servicio.Producir(Receta, CantidadAProducir, 1);
 
 				//	Assert
+				var cuantos = inventarioRepository.TraerUnoAsync
 
 				
 			}

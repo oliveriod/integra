@@ -10,6 +10,10 @@ namespace Integra.Shared.Domain
 		public uint ArtículoId { get; set; }
 
 		[Required]
+		public ushort EmpresaId { get; set; }
+		public Empresa Empresa { get; set; }
+
+		[Required]
 		[StringLength(20)]
 		public string Código { get; set; }
 

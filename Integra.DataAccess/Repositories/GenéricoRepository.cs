@@ -69,15 +69,31 @@ namespace Integra.DataAccess.Repositories
 			_context.SaveChanges();
 		}
 
-		public virtual IEnumerable<T> TraerTodos()
+		public virtual IEnumerable<T> TraerTodos(Expression<Func<T, bool>> elWhere)
 		{
-			return _context.Set<T>().ToList();
+			return TraerTodos(elWhere, null);
 		}
-
-		public virtual async Task<List<T>> TraerTodosAsync(Expression<Func<T, string>> elOrderBy)
+		public virtual IEnumerable<T> TraerTodos(Expression<Func<T, bool>> elWhere, Expression<Func<T, string>> elOrderBy)
 		{
 			var Entidad = from a in _context.Set<T>()
 						  select a;
+
+			if (elWhere != null)
+				Entidad = Entidad.Where(elWhere);
+
+			if (elOrderBy != null)
+				Entidad = Entidad.OrderBy(elOrderBy);
+
+			return Entidad.ToList<T>();
+		}
+
+		public virtual async Task<List<T>> TraerTodosAsync(Expression<Func<T, bool>> elWhere, Expression<Func<T, string>> elOrderBy)
+		{
+			var Entidad = from a in _context.Set<T>()
+						  select a;
+
+			if (elWhere != null)
+				Entidad = Entidad.Where(elWhere);
 
 			if (elOrderBy != null)
 				Entidad = Entidad.OrderBy(elOrderBy);

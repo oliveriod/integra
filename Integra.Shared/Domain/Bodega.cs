@@ -5,9 +5,9 @@ namespace Integra.Shared.Domain
 {
 	public class Bodega : DatosBase
 	{
-		public byte BodegaId { get; set; }
+		public ushort BodegaId { get; set; }
 
-		public byte SucursalId { get; set; }
+		public ushort SucursalId { get; set; }
 		public Sucursal Sucursal { get; set; }
 
 		[Required]

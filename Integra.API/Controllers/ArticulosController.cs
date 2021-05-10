@@ -46,7 +46,7 @@ namespace Integra.API
 		{
 			try
 			{
-				var resultado = _artículoService.Adicionar(algoParaAdicionar);
+				var resultado = _artículoService.AdicionarArtículo(algoParaAdicionar);
 
 				if (resultado == null)
 					return NotFound();
