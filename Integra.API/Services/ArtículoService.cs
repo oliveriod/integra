@@ -182,7 +182,7 @@ namespace Integra.API.Services
 			elWhereDeReceta = n => n.RecetaId == recetaId;
 
 			var ResultadoReceta = _recetaRepository.TraerUnoAsync(elWhereDeReceta
-						, new List<string> { "RecetaDetalle", "Artículo.ArtículoTipo" }
+						, new List<string> { "RecetaDetalles" } //, "Artículo.ArtículoTipo" }
 						);
 			var LaReceta = ResultadoReceta.Result;
 
@@ -201,7 +201,7 @@ namespace Integra.API.Services
 			elWhereDeInventario = n => n.BodegaId == BodegaId && ListaDeArtículos.Contains(n.ArtículoId);
 
 			var ResultadoInventario = _inventarioRepository.TraerVariosSinTopeAsync(elWhereDeInventario
-						, new List<string> { "RecetaDetalle", "Artículo", "Artículo.Unidad" }
+						, new List<string> {"Artículo", "Artículo.Unidad" }
 						, null
 						);
 			var ElInventario = ResultadoInventario.Result;

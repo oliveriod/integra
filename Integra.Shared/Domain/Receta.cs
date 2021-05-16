@@ -24,12 +24,13 @@ namespace Integra.Shared.Domain
 		public uint ArtículoId { get; set; }
 		public Artículo Artículo { get; set; }
 
+		[Required]
 		public decimal CantidadProducida { get; set; }
 
 		/// <summary>
 		/// Insumos
 		/// </summary>
-		public List<RecetaDetalle> RecetaDetalles { get; set; }
+		public ICollection<RecetaDetalle> RecetaDetalles { get; set; }
 	}
 
 }

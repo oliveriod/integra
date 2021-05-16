@@ -140,7 +140,7 @@ namespace Integra.DataAccess
 
 			// Ubicación
 			modelBuilder.Entity<Ubicación>()
-				.HasKey(o => new { o.BodegaId, o.Código })
+				.HasAlternateKey(o => new { o.BodegaId, o.Código })
 				;
 
 
@@ -237,7 +237,6 @@ namespace Integra.DataAccess
 				);
 
 			// Valores por defecto
-			modelBuilder.Entity<Ubicación>().HasData(new Ubicación { UbicaciónId = 1, Descripción = "Sin Ubicación", Código = "SU000000" });
 			modelBuilder.Entity<Vendedor>().HasData(new Vendedor { VendedorId = 1, Nombre = "Sin Vendedor", TipoEnteId = TipoEnteEnum.PorDefecto, EstadoId = EstadoEnum.Activo });
 			modelBuilder.Entity<Cliente>().HasData(new Cliente { ClienteId = 1, Nombre = "Contado", TipoEnteId = TipoEnteEnum.PorDefecto, EstadoId = EstadoEnum.Activo });
 

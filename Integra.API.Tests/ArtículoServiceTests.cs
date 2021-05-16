@@ -103,9 +103,15 @@ namespace Integra.API.Tests
 			}
 		}
 
+		// Hacer una prueba del servicio que crea artículos (revisar que los meta en la bodega.ubicación)
+
+
+
+		// Hacer una prueba del servicio que crea ubicaciones (revisar que meta los artículos en la bodega.ubicación)
+
 		[Theory]
 		[InlineData(1, 4, 4)]
-		[InlineData(2, 3, 0)]
+//		[InlineData(1, 7, 0)]
 		public void ProcesarRecetas(ushort Receta, int CantidadAProducir, int CantidadProducida)
         {
 			// Arrange
@@ -122,57 +128,60 @@ namespace Integra.API.Tests
 				context.Database.OpenConnection();
 				context.Database.EnsureCreated();
 
+				context.SaveChanges();
+			}
 
+			using (var context = new IntegraDbContext(options))
+			{
                 var artículoRepository = new ArtículoRepository(context);
-                var inventarioRepository = new InventarioRepository(context);
-                var recetaRepository = new RecetaRepository(context);
-
 
                 // Crear artículos
-                artículoRepository.Adicionar(new Artículo { ArtículoId = 1, ArtículoSubTipoId = 1, UnidadId = 11, Código = "LEC001", Nombre = "Leche Entera", EstadoId = EstadoEnum.Activo });
-				artículoRepository.Adicionar(new Artículo { ArtículoId = 2, ArtículoSubTipoId = 3, UnidadId = 11, Código = "NAT001", Nombre = "Nata líquida", EstadoId = EstadoEnum.Activo } );
-				artículoRepository.Adicionar(new Artículo { ArtículoId = 3, ArtículoSubTipoId = 4, UnidadId = 13, Código = "FSE001", Nombre = "Avellanas", EstadoId = EstadoEnum.Activo } );
-				artículoRepository.Adicionar(new Artículo { ArtículoId = 4, ArtículoSubTipoId = 4, UnidadId = 13, Código = "FSE002", Nombre = "Mani", EstadoId = EstadoEnum.Activo } );
-				artículoRepository.Adicionar(new Artículo { ArtículoId = 5, ArtículoSubTipoId = 4, UnidadId = 13, Código = "FSE003", Nombre = "Nueces", EstadoId = EstadoEnum.Activo } );
-				artículoRepository.Adicionar(new Artículo { ArtículoId = 6, ArtículoSubTipoId = 6, UnidadId = 11, Código = "ESP001", Nombre = "Vainilla", EstadoId = EstadoEnum.Activo } );
-				artículoRepository.Adicionar(new Artículo { ArtículoId = 7, ArtículoSubTipoId = 6, UnidadId = 11, Código = "VAR001", Nombre = "Azucar", EstadoId = EstadoEnum.Activo } );
-				artículoRepository.Adicionar(new Artículo { ArtículoId = 8, ArtículoSubTipoId = 6, UnidadId = 13, Código = "VAR002", Nombre = "canela", EstadoId = EstadoEnum.Activo } );
-				artículoRepository.Adicionar(new Artículo { ArtículoId = 9, ArtículoSubTipoId = 6, UnidadId = 13, Código = "VAR003", Nombre = "Chocolate", EstadoId = EstadoEnum.Activo } );
-				artículoRepository.Adicionar(new Artículo { ArtículoId = 10, ArtículoSubTipoId = 100, UnidadId = 12, Código = "HEL001", Nombre = "Helado de Vainilla", EstadoId = EstadoEnum.Activo } );
-				artículoRepository.Adicionar(new Artículo { ArtículoId = 11, ArtículoSubTipoId = 100, UnidadId = 12, Código = "HEL002", Nombre = "Helado de Chocolate", EstadoId = EstadoEnum.Activo} );
-
-                //Crear las recetas
-				recetaRepository.Adicionar(new Receta { RecetaId = 1, Nombre = "Helado de nueces y chocolate", ArtículoId = 101,
-                RecetaDetalles = new List<RecetaDetalle>()
-                    {
-                        new RecetaDetalle { RecetaId = 1, ArtículoId = 3, Cantidad = 100},
-                        new RecetaDetalle { RecetaId = 1, ArtículoId = 5,  Cantidad = 200},
-                        new RecetaDetalle { RecetaId = 1, ArtículoId = 9, Cantidad = 300}
-
-                    }
-                });
-				recetaRepository.Adicionar(new Receta { RecetaId = 2, Nombre = "Helado de Avellanas", ArtículoId = 102,
-                RecetaDetalles =    new List<RecetaDetalle>()
-                    {
-                        new RecetaDetalle { RecetaId = 2, ArtículoId = 1, Cantidad = 200},
-                        new RecetaDetalle { RecetaId = 2, ArtículoId = 4,  Cantidad = 300},
-                        new RecetaDetalle { RecetaId = 2, ArtículoId = 7, Cantidad = 200}
-                    }
-                 });
-
-                //  Llenar el inventario para las pruebas
-				inventarioRepository.Adicionar(new Inventario { BodegaId=1, UbicaciónId=1, ArtículoId = 3, Cantidad=400, UnidadId = 1 });
-				inventarioRepository.Adicionar(new Inventario { BodegaId=1, UbicaciónId=1, ArtículoId = 5, Cantidad=800, UnidadId = 1 });
-				inventarioRepository.Adicionar(new Inventario { BodegaId=1, UbicaciónId=1, ArtículoId = 9, Cantidad=1200, UnidadId = 1 });
-
-				inventarioRepository.Adicionar(new Inventario { BodegaId=1, UbicaciónId=1, ArtículoId = 1, Cantidad=600, UnidadId = 1 });
-				inventarioRepository.Adicionar(new Inventario { BodegaId=1, UbicaciónId=1, ArtículoId = 4, Cantidad=900, UnidadId = 1 });
-				inventarioRepository.Adicionar(new Inventario { BodegaId=1, UbicaciónId=1, ArtículoId = 7, Cantidad=400, UnidadId = 1 });
-
-
+                artículoRepository.Adicionar(new Artículo { ArtículoSubTipoId = 1, UnidadId = 11, Código = "LEC001", Nombre = "Leche Entera", EstadoId = EstadoEnum.Activo });
+				artículoRepository.Adicionar(new Artículo { ArtículoSubTipoId = 3, UnidadId = 11, Código = "NAT001", Nombre = "Nata líquida", EstadoId = EstadoEnum.Activo } );
+				artículoRepository.Adicionar(new Artículo { ArtículoSubTipoId = 4, UnidadId = 13, Código = "FSE001", Nombre = "Avellanas", EstadoId = EstadoEnum.Activo } );
+				artículoRepository.Adicionar(new Artículo { ArtículoSubTipoId = 4, UnidadId = 13, Código = "FSE003", Nombre = "Nueces", EstadoId = EstadoEnum.Activo } );
+				artículoRepository.Adicionar(new Artículo { ArtículoSubTipoId = 6, UnidadId = 13, Código = "VAR003", Nombre = "Chocolate", EstadoId = EstadoEnum.Activo } );
+				artículoRepository.Adicionar(new Artículo { ArtículoSubTipoId = 100, UnidadId = 12, Código = "HEL001", Nombre = "Helado de Vainilla", EstadoId = EstadoEnum.Activo } );
 
 				context.SaveChanges();
 			}
+
+
+			using (var context = new IntegraDbContext(options))
+			{
+				var recetaRepository = new RecetaRepository(context);
+
+				//Crear las recetas
+				recetaRepository.Adicionar(new Receta
+				{
+					RecetaId = 1,
+					Nombre = "Helado de nueces y chocolate",
+					ArtículoId = 6,
+					CantidadProducida = 1,
+					RecetaDetalles = new List<RecetaDetalle>()
+					{
+						new RecetaDetalle { RecetaDetalleId=1, RecetaId = 1, ArtículoId = 1, Cantidad = 100},
+						new RecetaDetalle { RecetaDetalleId=2, RecetaId = 1, ArtículoId = 4, Cantidad = 200},
+						new RecetaDetalle { RecetaDetalleId=3, RecetaId = 1, ArtículoId = 5, Cantidad = 300}
+
+					}
+				});
+				context.SaveChanges();
+			}
+
+
+			using (var context = new IntegraDbContext(options))
+			{
+				var inventarioRepository = new InventarioRepository(context);
+
+				//  Llenar el inventario para las pruebas
+				inventarioRepository.Adicionar(new Inventario { BodegaId = 1, UbicaciónId = 1, ArtículoId = 1, Cantidad = 400, UnidadId = 1 });
+				inventarioRepository.Adicionar(new Inventario { BodegaId = 1, UbicaciónId = 1, ArtículoId = 4, Cantidad = 800, UnidadId = 1 });
+				inventarioRepository.Adicionar(new Inventario { BodegaId = 1, UbicaciónId = 1, ArtículoId = 5, Cantidad = 1200, UnidadId = 1 });
+
+				context.SaveChanges();
+			}
+
 
 			using (var context = new IntegraDbContext(options))
 			{
@@ -189,9 +198,11 @@ namespace Integra.API.Tests
 				servicio.Producir(Receta, CantidadAProducir, 1);
 
 				//	Assert
-				var cuantos = inventarioRepository.TraerUnoAsync
+				var inventarioTerminado = inventarioRepository.TraerUnoAsync(i => i.ArtículoId == 6 && i.BodegaId == 1 && i.UbicaciónId == 1);
+				var resultado = inventarioTerminado.Result;
 
-				
+				Assert.Equal(CantidadProducida, resultado.Cantidad);
+
 			}
 		}
 
